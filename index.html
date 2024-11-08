@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Moedas</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link para o CSS -->
+</head>
+<body>
+    <h1>Conversor de Moedas</h1>
+    <form id="currency-form">
+        <label for="value">Valor:</label>
+        <input type="number" id="value" required step="0.01"><br>
+        
+        <label for="currency">Converter de:</label>
+        <select id="currency">
+            <option value="BRL">Real (BRL)</option>
+            <option value="USD">Dólar (USD)</option>
+        </select><br>
+
+        <button type="button" onclick="convertCurrency()">Converter</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+        async function fetchExchangeRate() {
+            const response = await fetch('https://economia.awesomeapi.com.br/last/USD-BRL');
+            const data = await response.json();
+            return {
+                usdToBrl: parseFloat(data.USDBRL.high),
+                brlToUsd: parseFloat(data.USDBRL.low)
+            };
+        }
+
+        async function convertCurrency() {
+            const value = parseFloat(document.getElementById('value').value);
+            const currency = document.getElementById('currency').value;
+            const rates = await fetchExchangeRate();
+
+            let convertedValue;
+            let message;
+
+            if (currency === 'BRL') {
+                convertedValue = (value * rates.brlToUsd).toFixed(2);
+                message = `${value} BRL é equivalente a ${convertedValue} USD.`;
+            } else {
+                convertedValue = (value * rates.usdToBrl).toFixed(2);
+                message = `${value} USD é equivalente a ${convertedValue} BRL.`;
+            }
+
+            document.getElementById('result').innerText = message;
+        }
+    </script>
+</body>
+</html>
